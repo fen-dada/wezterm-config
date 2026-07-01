@@ -11,15 +11,15 @@ return {
    -- webgpu_preferred_adapter = gpu_adapters:pick_manual('Dx12', 'IntegratedGpu'),
    -- webgpu_preferred_adapter = gpu_adapters:pick_manual('Gl', 'Other'),
    underline_thickness = '1.5pt',
-	text_background_opacity = 0.6,
-	window_background_opacity = 0,
-	macos_window_background_blur = 20,
+   text_background_opacity = 0.6,
+   window_background_opacity = 0,
+   macos_window_background_blur = 20,
 
+   default_cursor_style = 'SteadyBar',
    -- cursor
    animation_fps = 240,
    cursor_blink_ease_in = 'EaseOut',
    cursor_blink_ease_out = 'EaseOut',
-   default_cursor_style = 'BlinkingBlock',
    cursor_blink_rate = 650,
 
    -- color scheme
