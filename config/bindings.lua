@@ -3,6 +3,30 @@ local platform = require('utils.platform')
 local backdrops = require('utils.backdrops')
 local act = wezterm.action
 
+-- Pi fullscreen owns its transcript; native ConPTY may suppress mouse tracking.
+local function pi_wheel(direction)
+   return wezterm.action_callback(function(window, pane)
+      local title = pane:get_title()
+      if title == 'pi' or title:match('^π %-') then
+         local button = direction == 'up' and '64' or '65'
+         window:perform_action(act.SendString('\x1b[<' .. button .. ';2;2M'), pane)
+      else
+         window:perform_action(act.SendKey({ key = direction == 'up' and 'UpArrow' or 'DownArrow', mods = 'NONE' }), pane)
+      end
+   end)
+end
+
+local function page_or_scrollback(direction)
+   return wezterm.action_callback(function(window, pane)
+      if pane:is_alt_screen_active() then
+         window:perform_action(act.SendKey({ key = direction == 'up' and 'PageUp' or 'PageDown', mods = 'NONE' }), pane)
+      else
+         window:perform_action(act.ScrollByPage(direction == 'up' and -0.75 or 0.75), pane)
+      end
+   end)
+end
+
+
 local mod = {}
 
 if platform.is_mac then
@@ -203,8 +227,8 @@ local keys = {
    -- panes: scroll pane
    { key = 'u',        mods = mod.SUPER, action = act.ScrollByLine(-5) },
    { key = 'd',        mods = mod.SUPER, action = act.ScrollByLine(5) },
-   { key = 'PageUp',   mods = 'NONE',    action = act.ScrollByPage(-0.75) },
-   { key = 'PageDown', mods = 'NONE',    action = act.ScrollByPage(0.75) },
+   { key = 'PageUp',   mods = 'NONE',    action = page_or_scrollback('up') },
+   { key = 'PageDown', mods = 'NONE',    action = page_or_scrollback('down') },
 
    -- key-tables --
    -- resizes fonts
@@ -251,6 +275,8 @@ local key_tables = {
 
 ---@type MouseBinding[]
 local mouse_bindings = {
+   { event = { Down = { streak = 1, button = { WheelUp = 1 } } }, mods = 'NONE', alt_screen = true, mouse_reporting = false, action = pi_wheel('up') },
+   { event = { Down = { streak = 1, button = { WheelDown = 1 } } }, mods = 'NONE', alt_screen = true, mouse_reporting = false, action = pi_wheel('down') },
    -- Ctrl-click will open the link under the mouse cursor
    {
       event = { Up = { streak = 1, button = 'Left' } },

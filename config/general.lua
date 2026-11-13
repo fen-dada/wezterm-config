@@ -1,5 +1,7 @@
 ---@type Config
+local wezterm = require('wezterm')
 return {
+   set_environment_variables = { PATH = wezterm.executable_dir .. ';' .. (os.getenv('PATH') or '') },
    -- behaviours
    automatically_reload_config = true,
    exit_behavior = 'CloseOnCleanExit', -- if the shell program exited with a successful status
